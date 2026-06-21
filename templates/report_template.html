@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Statix · Reporte de Auditoría Fiscal</title>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f8; color: #1f2937; margin: 0; padding: 2rem; }
+  .container { max-width: 960px; margin: 0 auto; background: #ffffff; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+  h1 { color: #0f172a; }
+  .kpis { display: flex; gap: 1rem; margin: 1.5rem 0; }
+  .kpi-card { flex: 1; background: #f8fafc; border-left: 4px solid #0ea5e9; border-radius: 8px; padding: 1rem; }
+  .kpi-card span { display: block; font-size: 0.85rem; color: #64748b; }
+  .kpi-card strong { font-size: 1.4rem; color: #0f172a; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0 2rem; font-size: 0.9rem; }
+  th, td { text-align: left; padding: 0.5rem 0.75rem; border-bottom: 1px solid #e2e8f0; }
+  th { background: #0f172a; color: #ffffff; }
+  .badge-green { color: #15803d; font-weight: 600; }
+  .badge-red { color: #b91c1c; font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>📊 Statix — Reporte de Auditoría Fiscal</h1>
+
+    <div class="kpis">
+      <div class="kpi-card">
+        <span>Total de Ingresos</span>
+        <strong>${{ "%.2f"|format(kpis.ingresos) }}</strong>
+      </div>
+      <div class="kpi-card">
+        <span>Total de Gastos</span>
+        <strong>${{ "%.2f"|format(kpis.gastos) }}</strong>
+      </div>
+      <div class="kpi-card">
+        <span>IVA Neto</span>
+        <strong>${{ "%.2f"|format(kpis.iva_neto) }}</strong>
+      </div>
+    </div>
+
+    <h2 class="badge-green">🟢 Facturas Válidas ({{ valid_invoices|length }})</h2>
+    <table>
+      <thead>
+        <tr><th>UUID</th><th>Fecha</th><th>RFC Emisor</th><th>RFC Receptor</th><th>Total</th></tr>
+      </thead>
+      <tbody>
+        {% for inv in valid_invoices %}
+        <tr>
+          <td>{{ inv.uuid }}</td>
+          <td>{{ inv.fecha }}</td>
+          <td>{{ inv.rfc_emisor }}</td>
+          <td>{{ inv.rfc_receptor }}</td>
+          <td>${{ "%.2f"|format(inv.total) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <h2 class="badge-red">🔴 Alertas de Integridad ({{ invalid_invoices|length }})</h2>
+    <table>
+      <thead>
+        <tr><th>UUID</th><th>Errores Detectados</th></tr>
+      </thead>
+      <tbody>
+        {% for inv in invalid_invoices %}
+        <tr>
+          <td>{{ inv.uuid }}</td>
+          <td>{{ inv._errores }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if anomalies %}
+    <h2>⚠️ Anomalías Detectadas ({{ anomalies|length }})</h2>
+    <table>
+      <thead>
+        <tr><th>UUID</th><th>Tipo de Anomalía</th><th>Total</th></tr>
+      </thead>
+      <tbody>
+        {% for a in anomalies %}
+        <tr>
+          <td>{{ a.uuid }}</td>
+          <td>{{ a.tipo_anomalia }}</td>
+          <td>${{ "%.2f"|format(a.total) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+</body>
+</html>
